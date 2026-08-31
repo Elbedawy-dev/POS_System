@@ -1,5 +1,5 @@
-import Transaction from "../models/Transaction"
-import Project from "../models/Project"
+import Transaction from "../models/Transaction.js"
+import Project from "../models/Project.js"
 
 export const createTransaction = async(req,res)=>{
     try{

@@ -3,10 +3,11 @@ import mongoose from "mongoose";
 const adminNotificationSchema = new mongoose.Schema({
     message: String,
     type: {
-        type: String, 
+        type: String,
         enum: ["info", "transaction", "project"],
-        senn: {type: String, default: false}
-    }
+        default: "info"
+    },
+    seen: { type: Boolean, default: false }
 }, {timestamps: true})
 
 export default mongoose.model("adminNotification", adminNotificationSchema)

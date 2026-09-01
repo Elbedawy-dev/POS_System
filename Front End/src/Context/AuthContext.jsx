@@ -1,14 +1,16 @@
 import { createContext, useState, useEffect } from "react";
 import api from "../api/axios";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
-    api.get("/auth/me") 
+    api
+      .get("/auth/me")
       .then((res) => setUser(res.data))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
@@ -35,3 +37,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;

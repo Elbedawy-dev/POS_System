@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../api/axios";
+import api from "../api/axios";
 import { FiUsers, FiEdit, FiTrash2, FiPlus, FiMail, FiShield } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -18,7 +18,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("/admin/users")
+      const res = await api.get("/admin/users")
       setUsers(res.data)
     } catch (err) {
       console.error(err)
@@ -26,7 +26,7 @@ const Users = () => {
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     fetchUsers()
   }, [])
 
@@ -56,9 +56,9 @@ const Users = () => {
   const handleSaveUser = async () => {
     try {
       if (isEdit) {
-        await axios.put(`/admin/users/${currentUser._id}`, currentUser)
+        await api.put(`/admin/users/${currentUser._id}`, currentUser)
       } else {
-        await axios.post("/admin/users", currentUser)
+        await api.post("/admin/users", currentUser)
       }
       fetchUsers()
       setOpenModal(false)
@@ -71,7 +71,7 @@ const Users = () => {
     if (!id) return;
 
     try {
-      await axios.delete(`/admin/users/${id}`)
+      await api.delete(`/admin/users/${id}`)
       fetchUsers()
     } catch (err) {
       console.error(err)

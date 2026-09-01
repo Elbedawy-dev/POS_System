@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import axios from "../api/axios";
+import api from "../api/axios";
 
 const Settings = () => {
   const [settings, setSettings] = useState(null)
@@ -8,7 +7,7 @@ const Settings = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await axios.get("/admin/settings")
+        const res = await api.get("/admin/settings")
         setSettings(res.data)
       } catch (err) {
         console.error(err)
@@ -19,7 +18,7 @@ const Settings = () => {
 
   const handleUpdateSettings = async (updatedSettings) => {
     try {
-      const res = await axios.put("/admin/settings", updatedSettings)
+      const res = await api.put("/admin/settings", updatedSettings)
       setSettings(res.data)
     } catch (err) {
       console.error(err)

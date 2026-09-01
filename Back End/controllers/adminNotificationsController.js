@@ -6,7 +6,7 @@ export const getAdminNotifications = async (req, res) => {
 }
 
 export const markAdminNotificationSeen = async (req, res) => {
-    const note = await AdminNotification.findByIdAndUpdate(req.params.id, {seen: true}, {new: true});
+    const note = await AdminNotification.findByIdAndUpdate(req.params.id, { seen: true }, {new: true});
     res.json(note)
 }
 

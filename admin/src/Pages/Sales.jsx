@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import API from "../api/axios";
+import api from "../api/axios";
 import { FiDollarSign, FiUser, FiShoppingCart, FiCalendar } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,7 +11,7 @@ const Sales = () => {
 
   const fetchSales = async () => {
     try {
-      const res = await API.get("/admin/transactions")
+      const res = await api.get("/admin/transactions")
       setSales(res.data)
     } catch (err) {
       console.error(err)
@@ -21,7 +21,7 @@ const Sales = () => {
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     fetchSales()
   }, [])
 

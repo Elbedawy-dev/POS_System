@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../api/axios";
+import api from "../api/axios";
 import { motion } from "framer-motion";
 import {
   FaUserFriends,
@@ -16,7 +16,7 @@ const Customers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get("/customers");
+      const res = await api.get("/customers");
       setCustomers(res.data)
     } catch (err) {
       console.error(err)
@@ -24,7 +24,7 @@ const Customers = () => {
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     fetchCustomers()
   }, [])
 
@@ -43,9 +43,9 @@ const Customers = () => {
   const saveCustomer = async () => {
     try {
       if (isEdit) {
-        await axios.put(`/customers/${current._id}`, current)
+        await api.put(`/customers/${current._id}`, current)
       } else {
-        await axios.post("/customers", current)
+        await api.post("/customers", current)
       }
       fetchCustomers()
       closeForm()
@@ -55,7 +55,7 @@ const Customers = () => {
   }
 
   const deleteCustomer = async (id) => {
-    await axios.delete(`/customers/${id}`);
+    await api.delete(`/customers/${id}`);
     fetchCustomers()
   }
 

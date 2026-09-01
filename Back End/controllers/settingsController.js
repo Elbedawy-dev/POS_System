@@ -8,7 +8,7 @@ export const getSettings = async(req,res)=>{
 
 
 export const updateSettings = async(req,res)=>{
-    const settings = await Settings.findByIdAndUpdate({}, req.body,{
+    const settings = await Settings.findOneAndUpdate({}, req.body,{
         new:true,
         upsert:true,
     })

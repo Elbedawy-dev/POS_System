@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import API from "../api/axios";
+import api from "../api/axios";
 import {
   FiInfo,
   FiCheckCircle,
@@ -20,7 +20,7 @@ const Notifications = () => {
 
   const fetchNotes = async () => {
     try {
-      const res = await API.get("/admin/notifications")
+      const res = await api.get("/admin/notifications")
       setNotifications(res.data)
     } catch (err) {
       console.error(err)
@@ -30,13 +30,13 @@ const Notifications = () => {
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     fetchNotes()
   }, [])
 
   const handleMarkSeen = async (id) => {
     try {
-      const res = await API.put(`/admin/notifications/seen/${id}`)
+      const res = await api.put(`/admin/notifications/${id}`, { seen: true })
       setNotifications((prev) =>
         prev.map((note) => (note._id === id ? res.data : note)))
     } catch (err) {
@@ -47,7 +47,7 @@ const Notifications = () => {
   const handleCreate = async () => {
     if (!newNote.message) return;
     try {
-      const res = await API.post("/admin/notifications", newNote)
+      const res = await api.post("/admin/notifications", newNote)
       setNotifications([res.data, ...notifications])
       setNewNote({ message: "", type: "info" })
       setOpenModal(false)

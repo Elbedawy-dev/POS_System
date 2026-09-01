@@ -14,11 +14,11 @@ const transactionSchema = new mongoose.Schema({
     },
 
     status: {
-        type: String, enum: ["pending", "completed", "failed"] , defult: "pending"
+        type: String, enum: ["pending", "completed", "failed"], default: "pending"
     },
 
-    PaymentMethod: {
-         type: String, enum: ["cash", "visa"] , defult: "cash"
+    paymentMethod: {
+         type: String, enum: ["cash", "visa"], default: "cash"
     }, 
     
 }, {timestamps: true})

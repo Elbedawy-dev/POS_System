@@ -4,7 +4,7 @@ const notificationsSchema = new mongoose.Schema({
 
     message:String,
     type: {type: String, enum: ["low_stock", "invoice", "info"]},
-    senn: {type: Boolean, default:false},
+    seen: {type: Boolean, default:false},
 
 },  {timestamps:true})
 

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "../api/axios";
-
-import { FiFileText, FiDollarSign, FiCalendar, FiInfo } from "react-icons/fi";
-
+import api from "../api/axios";
+import { FiFileText, FiDollarSign, FiCalendar, FiUser } from "react-icons/fi";
 import { motion } from "framer-motion";
 
 const Invoices = () => {
@@ -10,19 +8,19 @@ const Invoices = () => {
   const [invoices , setInvoices] = useState([])
   const [loading,setLoading] = useState(true)
 
-  useEffect(()=>{
-    const fetchInvoices = async ()=>{
-      try{
-        const res = await axios.get("/admin/transactions")
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const res = await api.get("/invoices")
         setInvoices(res.data)
-      }catch(err){
+      } catch(err) {
         console.error(err)
-      }finally{
+      } finally {
         setLoading(false)
       }
     }
     fetchInvoices()
-  },[])
+  }, [])  
 
   if(loading)
     return(
@@ -48,13 +46,19 @@ const Invoices = () => {
             <div>
               <p className="text-lg font-semibold flex items-center gap-2">
                 <FiFileText />
-                Invoice #{invoice._id.slice(-6)}
+                Invoice #{invoice.invoiceNumber}
               </p>
 
-              {invoice.data &&(
+              {invoice.cashier?.name && (
+                <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                  <FiUser /> {invoice.cashier.name}
+                </p>
+              )}
+
+              {invoice.createdAt && (
                 <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
                   <FiCalendar />
-                  {new Date(invoice.data).toLocaleDateString()}
+                  {new Date(invoice.createdAt).toLocaleDateString()}
                 </p>
               )}
             </div>
@@ -62,12 +66,11 @@ const Invoices = () => {
             <div className="text-right">
 
               <p className="text-xl font-bold flex justify-end items-center gap-1">
-                <FiDollarSign /> {invoice.totalAmount} USD
+                <FiDollarSign /> {invoice.finalTotal} USD
               </p>
 
               <div className="mt-1 text-gray-500 flex justify-end items-center gap-1 text-sm">
-                <FiInfo />
-                {invoice.status ? invoice.status : "Completed"}
+                {invoice.paymentMethod || "cash"}
               </div>
 
             </div>

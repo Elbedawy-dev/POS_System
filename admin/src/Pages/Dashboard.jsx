@@ -77,7 +77,6 @@ return (
               className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex
               justify-between items-center hover:bg-gray-100 transition">
               <div>
-
                 <p className="font-semibold">Invoice #{inv.invoiceNumber}</p>
                 <p className="text-sm text-gray-500">Total : {inv.finalTotal}</p>
               </div>

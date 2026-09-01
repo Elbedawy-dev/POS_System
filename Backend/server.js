@@ -64,7 +64,11 @@ app.use("/api/notifications" , notificationRoutes)
 app.use("/api/settings" , settingsRoutes)
 
 
-app.use((req,res)=> res.status(404).json({message:"Route Not Found"}))
+app.use((req,res)=> {
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.status(404).json({message:"Route Not Found"})
+})
 
 
 app.use((err,req,res,next) => {
@@ -78,5 +82,7 @@ const PORT = process.env.PORT || 5000
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.error(err))
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 
 export default app

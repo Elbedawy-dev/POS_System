@@ -43,10 +43,26 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 
+let isConnected = false;
+
+async function connectDB() {
+  if (isConnected) return;
+  await mongoose.connect(process.env.MONGO_URI);
+  isConnected = true;
+  console.log("MongoDB Connected")
+}
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("DB connection error:", err);
+    res.status(500).json({ message: "Database connection failed" });
+  }
+});
 
 app.get("/" , (req,res)=> res.json({message:"api is running..."}))
-
-
 app.use("/api/admin/auth" , authRoutes)
 app.use("/api/admin/users" , adminUsersRoutes)
 app.use("/api/admin/dashboard" , adminDashboardRoutes)
@@ -63,26 +79,23 @@ app.use("/api/reports" , reportsRoutes)
 app.use("/api/notifications" , notificationRoutes)
 app.use("/api/settings" , settingsRoutes)
 
-
 app.use((req,res)=> {
   res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.status(404).json({message:"Route Not Found"})
 })
 
-
 app.use((err,req,res,next) => {
     console.error(err)
     res.status(500).json({message:err.message})
 })
 
-
 const PORT = process.env.PORT || 5000
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.error(err))
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+if (process.env.NODE_ENV !== "production") {
+  connectDB().then(() => {
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+  });
+}
 
 export default app

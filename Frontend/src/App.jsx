@@ -15,7 +15,7 @@ import EditProduct from "./Pages/EditProduct";
 import Home from "./Pages/Home";
 function App() {
   return (
-    <AuthProvider>
+    <AuthProvider> 
       <BrowserRouter>
         <Header />
         <Routes>

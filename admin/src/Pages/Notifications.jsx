@@ -38,7 +38,7 @@ const Notifications = () => {
     try {
       const res = await api.put(`/admin/notifications/${id}`, { seen: true })
       setNotifications((prev) =>
-        prev.map((note) => (note._id === id ? res.data : note)))
+        prev.map((note) => (note._id === id ? res.data: note)))
     } catch (err) {
       console.error(err)
     }

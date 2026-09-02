@@ -30,7 +30,8 @@ const Invoices = () => {
     )
 
   return (
-    <div className="p-6 bg-linear-to-b from-[#faf6ef] to-[#e8ddc9] pt-32 h-screen">
+    // <div className="p-6 bg-linear-to-b from-[#faf6ef] to-[#e8ddc9] pt-32 h-screen">
+    <div className="pt-32 p-10 min-h-screen bg-linear-to-b from-[#faf6ef] to-[#e8ddc9]">
 
       <motion.h2 initial={{opacity:0,y:-10}} animate={{opacity:1,y:0}}
         className="text-3xl font-bold mb-6 flex items-center gap-2">

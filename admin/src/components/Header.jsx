@@ -14,7 +14,7 @@ const Header = () => {
 
 const navLinks = [
   { name: "Dashboard", path: "/dashboard", icon: <FiBarChart /> },
-  { name: "Products", path: "/products", icon: <FiPackage /> },
+  { name: "Transactions", path: "/transactions", icon: <FiPackage /> },
   { name: "Invoices", path: "/invoices", icon: <FiFileText /> },
   { name: "Customers", path: "/customers", icon: <FiUser /> },
   { name: "Reports", path: "/reports", icon: <FiFileText /> },
@@ -127,8 +127,12 @@ const navLinks = [
            {admin ? (
 
             <div className="flex items-center gap-4 mt-2">
-              <FiBell size={22} className="text-yellow-500" />
-              <FiUser size={22} className="text-yellow-500" />
+              <Link to="/notifications" onClick={() => setIsMobileMenuOpen(false)}>
+                  <FiBell size={22} className="text-yellow-500" />
+              </Link>
+              <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                  <FiUser size={22} className="text-yellow-500" />
+              </Link>
 
               <button onClick={() => {
                 logout()

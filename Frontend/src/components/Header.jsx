@@ -129,8 +129,12 @@ const Header = () => {
            {user ? (
 
             <div className="flex items-center gap-4 mt-2">
-              <Bell size={22} className="text-yellow-500" />
-              <User size={22} className="text-yellow-500" />
+              <Link to="/notifications" onClick={() => setIsMobileMenuOpen(false)}>
+                <Bell size={22} className="text-yellow-500" />
+              </Link>
+              <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                <User size={22} className="text-yellow-500" />
+              </Link>
 
               <button onClick={() => {
                 logout()

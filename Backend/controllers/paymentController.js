@@ -78,9 +78,7 @@ export const createPaymentIntention = async (req, res) => {
 
     if (!paymobRes.ok) {
       console.error("Paymob intention error:", data);
-      // TEMP: returning Paymob's raw error so we can see the real cause.
-      // Remove "details" once this is working.
-      return res.status(500).json({ message: "Failed to create payment intention", details: data });
+      return res.status(500).json({ message: "Failed to create payment intention" });
     }
 
     res.json({
@@ -158,9 +156,12 @@ export const paymobWebhook = async (req, res) => {
       return res.status(404).json({ message: "Invoice not found" });
     }
 
-    // Paymob may retry the same callback. If we already finalized this invoice,
-    // do nothing — this prevents deducting stock twice.
-    if (invoice.paymentStatus !== "pending") {
+    // Paymob may retry the same callback, and the customer may also retry
+    // payment after an earlier decline (same invoice, new attempt). Only
+    // skip when it's already "paid" — that's the one state that must never
+    // be overwritten (it would risk double-deducting stock). A "failed"
+    // invoice must still be updatable by a later successful attempt.
+    if (invoice.paymentStatus === "paid") {
       return res.status(200).json({ message: "Already processed" });
     }
 

@@ -4,7 +4,6 @@ const invoiceSchema = new mongoose.Schema({
     invoiceNumber: {type: Number, required: true, unique:true},
 
     items: [
-
         {
             productId: {type: mongoose.Schema.Types.ObjectId, ref: "Product"},
             name:String,
@@ -12,13 +11,14 @@ const invoiceSchema = new mongoose.Schema({
             price: Number,
             total: Number,
         },
-
     ],
     subTotal:Number,
     discount:Number,
     tax:Number,
     finalTotal:Number,
     paymentMethod: {type: String, enum: ["cash", "visa"], default:"cash"},
+    paymentStatus: {type: String, enum: ["paid", "pending", "failed"], default: "paid"},
+    paymobOrderId: {type: String, default: null},
     cashier: {type: mongoose.Schema. Types.ObjectId, ref:"User"},
     customer: {type: mongoose. Schema. Types.ObjectId, ref: "Customer", default:null}
 

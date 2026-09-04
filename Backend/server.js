@@ -12,6 +12,7 @@ import adminNotificationsRoutes from "./routes/adminNotificationsRoutes.js";
 import adminSettingsRoutes from "./routes/adminSettingsRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import invoiceRoutes from "./routes/invoiceRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import reportsRoutes from "./routes/reportsRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
@@ -74,6 +75,7 @@ app.use("/api/admin/settings" , adminSettingsRoutes)
 app.use("/api/auth" , userAuthRoutes)
 app.use("/api/products" , productRoutes)
 app.use("/api/invoices" , invoiceRoutes)
+app.use("/api/payments" , paymentRoutes)
 app.use("/api/customers" , customerRoutes)
 app.use("/api/reports" , reportsRoutes)
 app.use("/api/notifications" , notificationRoutes)

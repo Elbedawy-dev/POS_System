@@ -10,7 +10,12 @@ export const createInvoice = async (req, res) => {
       return res.status(400).json({ message: "Invoice must contain at least one item." });
     }
 
-    // Validate stock BEFORE creating the invoice / deducting anything
+    // Validate stock BEFORE creating the invoice / deducting anything.
+    // Also enrich each item with the product's real name/price — the
+    // frontend (Invoices.jsx) only sends productId/qty/total, so without
+    // this, item.name and item.price stay empty (which later breaks the
+    // Paymob payment intention, since it requires a name + amount per item).
+    const enrichedItems = [];
     for (const item of items) {
       const product = await Product.findById(item.productId);
       if (!product) {
@@ -25,6 +30,14 @@ export const createInvoice = async (req, res) => {
           message: `Insufficient stock for "${product.name}" - available: ${product.stock}, requested: ${qty}`,
         });
       }
+
+      enrichedItems.push({
+        productId: item.productId,
+        name: item.name || product.name,
+        qty,
+        price: item.price || product.sellingPrice,
+        total: Number(item.total) || product.sellingPrice * qty,
+      });
     }
 
     // Atomic invoice number generation (avoids race condition / duplicate invoiceNumber)
@@ -35,27 +48,36 @@ export const createInvoice = async (req, res) => {
     );
     const invoiceNumber = counter.seq;
 
-    const subTotal = items.reduce((acc, item) => acc + Number(item.total || 0), 0);
+    const subTotal = enrichedItems.reduce((acc, item) => acc + Number(item.total || 0), 0);
     const finalTotal = subTotal - Number(discount) + Number(tax);
+
+    // Card ("visa") invoices start as "pending" until Paymob's webhook confirms
+    // the money actually arrived. Cash is considered paid on the spot.
+    const paymentStatus = paymentMethod === "visa" ? "pending" : "paid";
 
     const invoice = await Invoice.create({
       invoiceNumber,
-      items,
+      items: enrichedItems,
       subTotal,
       discount,
       tax,
       finalTotal,
       paymentMethod,
+      paymentStatus,
       cashier: req.user._id,
       customer: customer || null,
     });
 
-    // Deduct stock only after the invoice is persisted
-    for (const item of items) {
-      await Product.updateOne(
-        { _id: item.productId, stock: { $gte: Number(item.qty) } },
-        { $inc: { stock: -Number(item.qty) } }
-      );
+    // Only deduct stock once the money is secured. For cash that's immediately;
+    // for card, the paymobWebhook handler deducts it once payment is confirmed
+    // (avoids selling stock for a card payment that ends up failing).
+    if (paymentStatus === "paid") {
+      for (const item of enrichedItems) {
+        await Product.updateOne(
+          { _id: item.productId, stock: { $gte: Number(item.qty) } },
+          { $inc: { stock: -Number(item.qty) } }
+        );
+      }
     }
 
     // Populate before sending

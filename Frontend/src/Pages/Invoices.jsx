@@ -18,6 +18,9 @@ const Invoices = () => {
     const [products, setProducts] = useState([])
     const [customers, setCustomers] = useState([])
     const [open, setOpen] = useState(false)
+    const [saving, setSaving] = useState(false)
+    const [checkoutUrl, setCheckoutUrl] = useState(null)
+    const [pendingInvoiceId, setPendingInvoiceId] = useState(null)
     const [newInvoice, setNewInvoice] = useState({
         items: [],
         discount: 0,
@@ -73,23 +76,82 @@ const Invoices = () => {
     setNewInvoice({ ...newInvoice, items });
     }
 
+    const resetInvoiceForm = () => {
+        setNewInvoice({
+            items: [],
+            discount: 0,
+            tax: 0,
+            paymentMethod: 'cash',
+            customer: ''
+        })
+    }
+
     const saveInvoices = async() => {
         try {
-            await api.post('/invoices', newInvoice)
-            await fetchAll()
-          
-            setOpen(false)
-            setNewInvoice({
-                items: [],
-                discount: 0,
-                tax: 0,
-                paymentMethod: 'cash',
-                customer: ''
+            setSaving(true)
+
+            // Step 1: create the invoice regardless of payment method.
+            // If paymentMethod is "visa" the backend creates it with
+            // paymentStatus "pending" and does NOT deduct stock yet.
+            const { data: invoice } = await api.post('/invoices', newInvoice)
+
+            if (newInvoice.paymentMethod === 'cash') {
+                await fetchAll()
+                setOpen(false)
+                resetInvoiceForm()
+                setSaving(false)
+                return
+            }
+
+            // Step 2: card payment — ask the backend for a Paymob payment
+            // intention for the invoice we just created.
+            const { data: intent } = await api.post('/payments/create-intention', {
+                invoiceId: invoice._id,
             })
+
+            const url = `https://accept.paymob.com/unifiedcheckout/?publicKey=${intent.publicKey}&clientSecret=${intent.clientSecret}`
+
+            setOpen(false)
+            setPendingInvoiceId(invoice._id)
+            setCheckoutUrl(url)
         } catch (error) {
             console.error('Error saving invoice:', error)
+            alert(error.response?.data?.message || 'Error saving invoice')
+        } finally {
+            setSaving(false)
         }
     }
+
+    // While the payment iframe is open, poll the invoice every few seconds.
+    // Paymob's webhook is what actually flips paymentStatus on the backend —
+    // this polling just lets the UI find out and react.
+    useEffect(() => {
+        if (!pendingInvoiceId) return undefined
+
+        const interval = setInterval(async () => {
+            try {
+                const { data } = await api.get(`/invoices/${pendingInvoiceId}`)
+
+                if (data.paymentStatus === 'paid') {
+                    clearInterval(interval)
+                    setCheckoutUrl(null)
+                    setPendingInvoiceId(null)
+                    await fetchAll()
+                    resetInvoiceForm()
+                    alert('Payment successful!')
+                } else if (data.paymentStatus === 'failed') {
+                    clearInterval(interval)
+                    setCheckoutUrl(null)
+                    setPendingInvoiceId(null)
+                    alert('Payment failed. Please try again.')
+                }
+            } catch (error) {
+                console.error(error)
+            }
+        }, 3000)
+
+        return () => clearInterval(interval)
+    }, [pendingInvoiceId])
 
     return (
     <div className="pt-32 p-5 md:px-12 bg-[#f6f4ef] min-h-screen">
@@ -141,6 +203,20 @@ const Invoices = () => {
                 {""}
 
                 {inv.items.length}
+            </p>
+
+            <p className = "text-sm text-neutral-600 mb-1">
+                <span className = "font-medium">Payment: </span>
+                {inv.paymentMethod === 'visa' ? 'Card' : 'Cash'}
+                {inv.paymentMethod === 'visa' && (
+                    <span className={
+                        inv.paymentStatus === 'paid' ? 'text-green-600 ml-1' :
+                        inv.paymentStatus === 'failed' ? 'text-red-600 ml-1' :
+                        'text-amber-600 ml-1'
+                    }>
+                        ({inv.paymentStatus})
+                    </span>
+                )}
             </p>
 
             <p className = "text-neutral-600 font-bold mt-3 text-lg">
@@ -239,17 +315,20 @@ const Invoices = () => {
                     value={newInvoice.paymentMethod} onChange={(e) => 
                     setNewInvoice({ ...newInvoice, paymentMethod: e.target.value })}>
 
+                    {/* IMPORTANT: this value must match the Invoice model's enum
+                        exactly ("cash" | "visa"). "credit_card" is NOT a valid
+                        value and was causing the Mongoose validation error. */}
                     <option value="cash">Cash</option>
-                    <option value="credit_card">Card</option>
+                    <option value="visa">Card</option>
                 </select>
             </div>
         </div>
 
         <div className = "flex justify-end mt-6">
             <motion.button whileHover={{scale:1.05}} whileTap={{scale:0.69}} 
-                onClick={saveInvoices} className = "px-6 py-2 bg-[#C9A86A] text-white rounded-xl
-                shadow-lg hover:bg-[#b8965f] transition">
-                    Save Invoice 
+                onClick={saveInvoices} disabled={saving} className = "px-6 py-2 bg-[#C9A86A] text-white rounded-xl
+                shadow-lg hover:bg-[#b8965f] transition disabled:opacity-60">
+                    {saving ? 'Saving...' : 'Save Invoice'}
             </motion.button>   
         </div>
 
@@ -257,6 +336,35 @@ const Invoices = () => {
           </motion.div>
         )}
         </AnimatePresence>
+
+    {/* Paymob checkout — opens automatically after saving a "Card" invoice */}
+    <AnimatePresence>
+    {checkoutUrl && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 p-4 bg-black/40 backdrop-blur-sm flex justify-center
+        items-center z-100">
+        <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.85, opacity: 0 }} transition={{ type: "spring", stiffness: 180, damping: 20 }}
+            className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border
+            border-[#C9A86A]/40 overflow-hidden">
+
+            <div className="flex items-center justify-between p-4 border-b">
+                <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                    <CreditCard size={20} className="text-[#C9A86A]" /> Complete Payment
+                </h2>
+            </div>
+
+            <iframe
+                src={checkoutUrl}
+                title="Paymob Checkout"
+                width="100%"
+                height="600"
+                style={{ border: "none" }}
+            />
+        </motion.div>
+        </motion.div>
+    )}
+    </AnimatePresence>
     </div> 
     )
 }

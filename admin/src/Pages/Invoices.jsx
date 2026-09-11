@@ -28,7 +28,7 @@ const Invoices = () => {
         Loading Invoices...
       </div>
     )
-
+ 
   return (
     // <div className="p-6 bg-linear-to-b from-[#faf6ef] to-[#e8ddc9] pt-32 h-screen">
     <div className="pt-32 p-10 min-h-screen bg-linear-to-b from-[#faf6ef] to-[#e8ddc9]">

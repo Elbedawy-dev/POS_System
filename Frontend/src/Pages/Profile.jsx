@@ -129,7 +129,7 @@ const Profile = () => {
             </Box>
         </Paper>
 
-        <Paper className="p-6 rounded-2xl shadow-xl border border-neutral-300 flex flex-col gap-4
+        <Paper className="p-6 mb-30 rounded-2xl shadow-xl border border-neutral-300 flex flex-col gap-4
         bg-white">
             <Typography variant="h5" className="font-bold text-yellow-600">
                 Additional Info

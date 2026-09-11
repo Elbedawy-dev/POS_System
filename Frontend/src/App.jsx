@@ -13,6 +13,7 @@ import CreateProduct from "./Pages/CreateProduct";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EditProduct from "./Pages/EditProduct";
 import Home from "./Pages/Home";
+import Sales from "./Pages/sales";
 function App() {
   return (
     <AuthProvider> 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           
           <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} /> 
+          <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

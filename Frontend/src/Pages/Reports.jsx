@@ -31,13 +31,15 @@ const Reports = () => {
     const [chartData , setChartData] = useState([])
 
     useEffect(() => {
-        api.post('/reports/daily').then((res) => setDaily(res.data))
-        api.get('/reports/top-products').then((res) => setTopProducts(res.data))
-        api.get('/reports/weekly').then((res) => setChartData(res.data))
+        api.post('/reports/daily').then((res) => setDaily(res.data)).catch((err) => console.log(err))
+        api.get('/reports/top-products').then((res) => setTopProducts(res.data)).catch((err) => console.log(err))
+        api.get('/reports/weekly').then((res) => setChartData(res.data)).catch((err) => console.log(err))
     }, [])
 
-    const getRangeReports = () => {
+    const getRangeReports = (e) => {
+        e.preventDefault();
         api.post('/reports/range',  dates).then((res) => setRange(res.data))
+        .catch((err) => console.log(err))
     }
 
 return (
@@ -46,8 +48,8 @@ return (
 
     <motion.div initial = {{y: -15 , opacity: 0}} animate={{y: 0 , opacity: 1}}
      className = "text-center space-y-4">
-        <h1 className="text-5xl font-bold text-neutral-900 flex justify-center
-         items-center gap-3">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold 
+        text-neutral-900 flex justify-center items-center gap-3">
            <LineChart size={40} className="text-neutral-900" />
               Reports & Insights
         </h1>
@@ -106,7 +108,7 @@ return (
     })}
     </motion.div>
 
-    <motion.section initial = {{opacity:0 , y:30}} animate = {{opacity:1 , y:0}}
+    <motion.section initial = {{opacity: 0 , y: 30}} animate = {{opacity:1 , y:0}}
         transition = {{delay:0.2}} className = "bg-white rounded-3xl shadow-md p-10
         border border-neutral-200">
 
@@ -143,11 +145,11 @@ return (
     <form onSubmit={getRangeReports} className="flex flex-col md:flex-row gap-4 items-center mb-6">
 
         <input type="date" value={dates.start}
-            onChange={(e) => setDates({...dates,start:e.target.value})}
+            onChange={(e) => setDates({...dates, start: e.target.value})}
             className="border border-neutral-300 rounded-lg px-3 py-2 w-full md:w-auto"
             required />
         <input type="date" value={dates.end}
-            onChange={(e)=> setDates({...dates, end:e.target.value})}
+            onChange={(e)=> setDates({...dates, end: e.target.value})}
             className="border border-neutral-300 rounded-lg px-3 py-2 w-full md:w-auto"
             required />
 
@@ -169,7 +171,7 @@ return (
 
             <p>
                 <strong>
-                    Invoices Count:</strong> {range.invoices.length} $
+                    Invoices Count:</strong> {range.invoices.length}
             </p>
        </motion.div> 
 

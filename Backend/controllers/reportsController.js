@@ -1,6 +1,5 @@
 import Invoice from "../models/Invoice.js"
 
-
 export const dailyReport = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0) 

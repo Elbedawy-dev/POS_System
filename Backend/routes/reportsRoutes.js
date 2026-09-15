@@ -11,9 +11,9 @@ import {protect , authorize} from "../middlewares/auth.js"
 
 const router = express.Router()
 
-router.post("/daily" , protect , authorize("manager" , "admin"), dailyReport)
-router.post("/range" , protect , authorize("manager" , "admin"), rangeReport)
-router.get("/top-products" , protect , authorize("manager" , "admin"), topProducts)
-router.get("/weekly" , protect , authorize("manager" , "admin"), weeklyReport)
+router.post("/daily" , protect , authorize("manager", "admin", "cashier"), dailyReport)
+router.post("/range" , protect , authorize("manager", "admin", "cashier"), rangeReport)
+router.get("/top-products" , protect , authorize("manager" , "admin", "cashier"), topProducts)
+router.get("/weekly" , protect , authorize("manager", "admin", "cashier"), weeklyReport)
 
 export default router

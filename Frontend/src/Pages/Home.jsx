@@ -67,7 +67,7 @@ const Home = () => {
         setError("Failed to fetch dashboard data. Please check your connection.");
       }
     } catch (err) {
-      console.error("Error loading home dashboard data:", err);
+      console.error("Error loading home dashboard data: ", err);
       setError("An unexpected error occurred while loading the dashboard.");
     } finally {
       setLoading(false);
@@ -202,13 +202,6 @@ const Home = () => {
   ];
 
   const quickActions = [
-    {
-      title: "New Sale",
-      path: "/sales",
-      description: "Launch checkout counter & process immediate sale",
-      icon: ShoppingCart,
-      badgeText: "POS Terminal",
-    },
     {
       title: "Add Product",
       path: "/products/create",
